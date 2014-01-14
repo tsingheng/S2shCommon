@@ -17,8 +17,20 @@ public class Page<T> {
 	private int limit;
 	private int pageNo;
 	private int pageSize;
-	private int totalCount;
+	private long totalCount;
 	private List<T> result;
+	private String hql;
+	private Object[] values;
+	public void setQuery(String hql, Object...values){
+		this.hql = hql;
+		this.values = values;
+	}
+	public String getHql(){
+		return hql;
+	}
+	public Object[] getValues(){
+		return values;
+	}
 	public Page(int limit){
 		this.limit = limit;
 	}
@@ -46,13 +58,13 @@ public class Page<T> {
 	public void setPageSize(int pageSize) {
 		this.pageSize = pageSize;
 	}
-	public int getTotalCount() {
+	public long getTotalCount() {
 		return totalCount;
 	}
-	public void setTotalCount(int totalCount) {
+	public void setTotalCount(long totalCount) {
 		this.totalCount = totalCount;
 		//计算总页数
-		this.pageSize = totalCount/limit;
+		this.pageSize = (int) (totalCount/limit);
 		pageSize = totalCount%limit==0?pageSize:pageSize+1;
 		//如果start为0就认为是用pageNo+limit查询,否则视为start+limit查询
 		if(start == 0){

@@ -3,6 +3,8 @@ package net.shangtech.ssh.core;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * 文件名： BaseService.java<br/>
  * 作者： 宋相恒<br/>
@@ -48,7 +50,14 @@ public abstract class BaseService<T> {
 		}
 	}
 	
-	public List<T> findAll(){
+	/**
+	 * 作者： 宋相恒<br/>
+	 * 版本： 2014-1-14 下午8:57:39 v1.0<br/>
+	 * 日期： 2014-1-14<br/>
+	 * @return<br/>
+	 * 描述：查询全部记录
+	 */
+	public List<T> find(){
 		try{
 			return dao().findAll();
 		}catch(Exception e){
@@ -57,6 +66,66 @@ public abstract class BaseService<T> {
 		}
 	}
 	
+	/**
+	 * 作者： 宋相恒<br/>
+	 * 版本： 2014-1-14 下午8:51:35 v1.0<br/>
+	 * 日期： 2014-1-14<br/>
+	 * @param page
+	 * @return<br/>
+	 * 描述：查找分页记录
+	 * 		<p>如果查找全部记录只需要start+limit或者pageNo+limit</p>
+	 * 		<p>如果使用查询语句查询需要设置page的hql+values</p>
+	 */
+	public Page<T> find(Page<T> page){
+		try{
+			if(StringUtils.isEmpty(page.getHql())){
+				page.setTotalCount(dao().countAll());
+				page.setResult(dao().findAll(page.getStart(), page.getLimit()));
+			}else{
+				page.setTotalCount(dao().count(page.getHql(), page.getValues()));
+				page.setResult(dao().find(page.getStart(), page.getLimit(), page.getHql(), page.getValues()));
+			}
+			return page;
+		}catch(Exception e){
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 * 作者： 宋相恒<br/>
+	 * 版本： 2014-1-14 下午8:57:59 v1.0<br/>
+	 * 日期： 2014-1-14<br/>
+	 * @param orderBy
+	 * @return<br/>
+	 * 描述：查询全部记录并使用orderBy规则排序
+	 */
+	public List<T> find(String orderBy){
+		try{
+			return dao().findAll(orderBy);
+		}catch(Exception e){
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 * 作者： 宋相恒<br/>
+	 * 版本： 2014-1-14 下午9:01:11 v1.0<br/>
+	 * 日期： 2014-1-14<br/>
+	 * @param page
+	 * @param orderBy
+	 * @return<br/>
+	 * 描述：分页查询全部记录并使用orderBy规则排序,如果是用hql查询应该使用只有page参数的方法,这个方法只查全部记录
+	 */
+	public Page<T> find(Page<T> page, String orderBy){
+		try{
+			page.setTotalCount(dao().countAll());
+			page.setResult(dao().findAll(page.getStart(), page.getLimit(), orderBy));
+			return page;
+		}catch(Exception e){
+			throw new RuntimeException(e);
+		}
+	}
 	
 	/**
 	 * 作者： 宋相恒<br/>
