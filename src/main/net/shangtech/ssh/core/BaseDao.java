@@ -48,11 +48,11 @@ public class BaseDao<T> extends HibernateDaoSupport {
 	 * 作者： 宋相恒<br/>
 	 * 版本： 2014-1-12 上午11:40:55 v1.0<br/>
 	 * 日期： 2014-1-12<br/>
-	 * @param obj<br/>
+	 * @param entity<br/>
 	 * 描述：更新记录
 	 */
-	public void update(Object obj) {
-		this.getHibernateTemplate().merge(obj);
+	public void update(T entity) {
+		this.getHibernateTemplate().merge(entity);
 	}
 	
 	/**
@@ -204,12 +204,12 @@ public class BaseDao<T> extends HibernateDaoSupport {
 	 * @return<br/>
 	 * 描述：统计某张表总的记录数
 	 */
-	public long countAll(){
+	public int countAll(){
 		String queryString = "select count(o) from " + getEntityClass().getSimpleName() + " o ";
 		Object count = gather(queryString);
 		if(count != null)
-			return (Long) count;
-		return 0L;
+			return ((Long) count).intValue();
+		return 0;
 	}
 	
 	/**
@@ -221,12 +221,12 @@ public class BaseDao<T> extends HibernateDaoSupport {
 	 * @return<br/>
 	 * 描述：查询满足条件的记录数量
 	 */
-	public long count(String hql, Object...values){
+	public int count(String hql, Object...values){
 		String queryString = "select count(o) from " + getEntityClass().getSimpleName() + " o " + hql;
 		Object count = gather(queryString, values);
 		if(count != null)
-			return (Long) count;
-		return 0L;
+			return ((Long) count).intValue();
+		return 0;
 	}
 	
 	/**

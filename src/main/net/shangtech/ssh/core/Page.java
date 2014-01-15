@@ -17,7 +17,7 @@ public class Page<T> {
 	private int limit;
 	private int pageNo;
 	private int pageSize;
-	private long totalCount;
+	private int totalCount;
 	private List<T> result;
 	private String hql;
 	private Object[] values;
@@ -61,7 +61,7 @@ public class Page<T> {
 	public long getTotalCount() {
 		return totalCount;
 	}
-	public void setTotalCount(long totalCount) {
+	public void setTotalCount(int totalCount) {
 		this.totalCount = totalCount;
 		//计算总页数
 		this.pageSize = (int) (totalCount/limit);

@@ -50,6 +50,15 @@ public abstract class BaseService<T> {
 		}
 	}
 	
+	public void update(T entity){
+		try{
+			dao().update(entity);
+		}catch(Exception e){
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+	
 	/**
 	 * 作者： 宋相恒<br/>
 	 * 版本： 2014-1-14 下午8:57:39 v1.0<br/>
@@ -127,6 +136,15 @@ public abstract class BaseService<T> {
 		}
 	}
 	
+	public int count(String hql, Object...values){
+		try{
+			return dao().count(hql, values);
+		}catch(Exception e){
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+	
 	/**
 	 * 作者： 宋相恒<br/>
 	 * 版本： 2014-1-12 下午2:31:51 v1.0<br/>
@@ -134,8 +152,7 @@ public abstract class BaseService<T> {
 	 * @return<br/>
 	 * 描述：获取实体T的类型
 	 */
-	@SuppressWarnings("unused")
-	private Class<?> getEntityClass() {
+	protected Class<?> getEntityClass() {
 		Class<?> entityClass = (Class<?>) ((ParameterizedType) getClass()
 				.getGenericSuperclass()).getActualTypeArguments()[0];
 		return entityClass;

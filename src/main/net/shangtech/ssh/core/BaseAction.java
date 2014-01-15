@@ -27,6 +27,9 @@ public abstract class BaseAction<T extends IBaseEntity> extends BaseMVC implemen
 	protected static final String FORM = "form";
 	protected static final String INDEX = "index";
 	
+	@Override
+	public void prepare() throws Exception {}
+	
 	/**
 	 * 作者： 宋相恒<br/>
 	 * 版本： 2014-1-14 下午10:01:25 v1.0<br/>
@@ -57,17 +60,24 @@ public abstract class BaseAction<T extends IBaseEntity> extends BaseMVC implemen
 	}
 	
 	protected abstract void list();
-	protected abstract void save();
+	protected void save(){
+		if(id == null){
+			service().add(entity);
+		}else{
+			service().update(entity);
+		}
+	}
 	
 	protected void prepareEdit(){
 		prepareModel();
 	}
+	
 	public String edit(){
-		id = super.getId();
 		if(GET.equals(request.getMethod())){
 			request.setAttribute("entity", entity);
 			return FORM;
 		}
+		id = super.getId();
 		if(id == null){
 			failed();
 			return null;

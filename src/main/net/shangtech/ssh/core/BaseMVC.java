@@ -61,27 +61,36 @@ public abstract class BaseMVC {
 		String id = getRequest().getParameter("id");
 		if(StringUtils.isNotBlank(id))
 			return Integer.parseInt(id);
+		id = getRequest().getParameter("entity.id");
+		if(StringUtils.isNotBlank(id))
+			return Integer.parseInt(id);
 		return null;
 	}
-	public void success(){
+	public String success(){
 		renderResult(true, "操作成功");
+		return null;
 	}
-	public void failed(){
+	public String failed(){
 		renderResult(true, "操作失败");
+		return null;
 	}
-	public void success(String msg){
+	public String success(String msg){
 		renderResult(true, msg);
+		return null;
 	}
-	public void failed(String msg){
+	public String failed(String msg){
 		renderResult(false, msg);
+		return null;
 	}
-	public void noSelected(){
+	public String noSelected(){
 		renderResult(false, "请先选择需要操作的记录");
+		return null;
 	}
-	public void renderResult(boolean success, String msg){
+	public String renderResult(boolean success, String msg){
 		JSONObject obj = new JSONObject();
 		obj.put("success", success);
 		obj.put("msg", msg);
+		return null;
 	}
 	public abstract HttpServletResponse getResponse();
 	public abstract HttpServletRequest getRequest();
