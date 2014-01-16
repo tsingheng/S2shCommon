@@ -75,6 +75,15 @@ public abstract class BaseService<T> {
 		}
 	}
 	
+	public List<T> find(String hql, Object...values){
+		try{
+			return dao().find(hql, values);
+		}catch(Exception e){
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+	
 	/**
 	 * 作者： 宋相恒<br/>
 	 * 版本： 2014-1-14 下午8:51:35 v1.0<br/>
