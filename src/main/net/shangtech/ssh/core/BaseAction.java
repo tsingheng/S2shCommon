@@ -5,9 +5,11 @@ import java.lang.reflect.ParameterizedType;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
 
+import com.opensymphony.xwork2.ModelDriven;
 import com.opensymphony.xwork2.Preparable;
 
 /**
@@ -17,7 +19,7 @@ import com.opensymphony.xwork2.Preparable;
  * 日期： 2014-1-14<br/>
  * 描述：
  */
-public abstract class BaseAction<T extends IBaseEntity> extends BaseMVC implements ServletRequestAware, ServletResponseAware, Preparable {
+public abstract class BaseAction<T extends IBaseEntity> extends BaseMVC implements ServletRequestAware, ServletResponseAware, Preparable, ModelDriven<T> {
 	protected HttpServletRequest request;
 	protected HttpServletResponse response;
 	protected T entity;
@@ -25,10 +27,12 @@ public abstract class BaseAction<T extends IBaseEntity> extends BaseMVC implemen
 	protected abstract BaseService<T> service();
 	protected static final String GET = "GET";
 	protected static final String FORM = "form";
-	protected static final String INDEX = "index";
+	public static final String SUCCESS = "success";
 	
 	@Override
-	public void prepare() throws Exception {}
+	public void prepare() throws Exception {
+		this.id = super.getId();
+	}
 	
 	/**
 	 * 作者： 宋相恒<br/>
@@ -37,7 +41,7 @@ public abstract class BaseAction<T extends IBaseEntity> extends BaseMVC implemen
 	 * 描述：添加或者修改的时候数据准备
 	 */
 	protected void prepareModel(){
-		id = super.getId();
+		this.id = super.getId();
 		if(id != null){
 			entity = service().find(id);
 		}else{
@@ -53,22 +57,30 @@ public abstract class BaseAction<T extends IBaseEntity> extends BaseMVC implemen
 	
 	public String execute(){
 		if(GET.equals(request.getMethod())){
-			return INDEX;
+			return SUCCESS;
 		}
 		list();
 		return null;
 	}
 	
 	protected abstract void list();
+	protected String checkSave(){
+		return null;
+	}
 	protected void save(){
-		if(id == null){
+		String check = checkSave();
+		if(StringUtils.isNotBlank(check)){
+			failed(check);
+			return;
+		}
+		if(entity.getId() == null){
 			service().add(entity);
 		}else{
 			service().update(entity);
 		}
 	}
 	
-	protected void prepareEdit(){
+	public void prepareEdit(){
 		prepareModel();
 	}
 	
@@ -77,22 +89,27 @@ public abstract class BaseAction<T extends IBaseEntity> extends BaseMVC implemen
 			request.setAttribute("entity", entity);
 			return FORM;
 		}
-		id = super.getId();
-		if(id == null){
+		if(entity.getId() == null){
 			failed();
 			return null;
 		}
 		save();
+		success();
 		return null;
 	}
-	protected void prepareAdd(){
+	public void prepareAdd(){
 		prepareModel();
 	}
 	public String add(){
 		if(GET.equals(request.getMethod()))
 			return FORM;
 		save();
+		success();
 		return null;
+	}
+	
+	public void prepareDel(){
+		prepareModel();
 	}
 	
 	/**
@@ -107,6 +124,9 @@ public abstract class BaseAction<T extends IBaseEntity> extends BaseMVC implemen
 		if(id == null){
 			failed();
 			return null;
+		}
+		if(entity == null){
+			failed("记录不存在");
 		}
 		delete();
 		return null;
@@ -135,20 +155,16 @@ public abstract class BaseAction<T extends IBaseEntity> extends BaseMVC implemen
 		this.response = response;
 	}
 
+	public T getModel(){
+		return entity;
+	}
+	
 	public T getEntity() {
 		return entity;
 	}
 
 	public void setEntity(T entity) {
 		this.entity = entity;
-	}
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
 	}
 	
 	@SuppressWarnings("unchecked")

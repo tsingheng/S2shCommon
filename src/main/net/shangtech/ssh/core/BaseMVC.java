@@ -61,9 +61,6 @@ public abstract class BaseMVC {
 		String id = getRequest().getParameter("id");
 		if(StringUtils.isNotBlank(id))
 			return Integer.parseInt(id);
-		id = getRequest().getParameter("entity.id");
-		if(StringUtils.isNotBlank(id))
-			return Integer.parseInt(id);
 		return null;
 	}
 	public String success(){
@@ -71,7 +68,7 @@ public abstract class BaseMVC {
 		return null;
 	}
 	public String failed(){
-		renderResult(true, "操作失败");
+		renderResult(false, "操作失败");
 		return null;
 	}
 	public String success(String msg){
@@ -90,6 +87,7 @@ public abstract class BaseMVC {
 		JSONObject obj = new JSONObject();
 		obj.put("success", success);
 		obj.put("msg", msg);
+		outJson(obj.toJSONString());
 		return null;
 	}
 	public abstract HttpServletResponse getResponse();

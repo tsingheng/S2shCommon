@@ -1,5 +1,7 @@
 package net.shangtech.ssh.core.sort;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.shangtech.ssh.core.BaseAction;
 
 
@@ -13,6 +15,8 @@ import net.shangtech.ssh.core.BaseAction;
  */
 public abstract class SortableAction<T extends Sortable> extends BaseAction<T> {
 
+	protected Integer parent;
+	
 	public String sort(){
 		id = super.getId();
 		if(id == null){
@@ -47,9 +51,19 @@ public abstract class SortableAction<T extends Sortable> extends BaseAction<T> {
 		return null;
 	}
 	
+	protected void delete(){
+		service().delete(id, getValues());
+		success();
+	}
+	
 	@Override
 	protected void save(){
-		if(id == null){
+		String check = checkSave();
+		if(StringUtils.isNotBlank(check)){
+			failed(check);
+			return;
+		}
+		if(entity.getId() == null){
 			service().add(entity, getValues());
 		}else{
 			service().update(entity, getValues());
@@ -61,9 +75,12 @@ public abstract class SortableAction<T extends Sortable> extends BaseAction<T> {
 	 */
 	@Override
 	public String add(){
+		int count = service().count(entity.getSortHql(), getValues());
+		if(entity.getSort() == null){
+			entity.setSort(count+1);
+		}
 		String result = super.add();
 		if(result != null){
-			int count = service().count(entity.getSortHql(), getValues());
 			request.setAttribute("max", count+1);
 			entity.setSort(count+1);
 			request.setAttribute("entity", entity);
@@ -76,16 +93,19 @@ public abstract class SortableAction<T extends Sortable> extends BaseAction<T> {
 	 */
 	@Override
 	public String edit(){
+		int count = service().count(entity.getSortHql(), getValues());
+		if(entity.getSort() == null){
+			entity.setSort(count);
+		}
 		String result = super.edit();
 		if(result != null){
-			int count = service().count(entity.getSortHql(), getValues());
 			request.setAttribute("max", count);
 		}
 		return result;
 	}
 	
 	protected Object[] getValues(){
-		return null;
+		return new Object[]{};
 	}
 	
 	@Override

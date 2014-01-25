@@ -1,5 +1,7 @@
 package net.shangtech.ssh.core.sort;
 
+import org.apache.commons.lang.ArrayUtils;
+
 import net.shangtech.ssh.core.BaseService;
 
 /**
@@ -17,8 +19,8 @@ public abstract class SortableService<T extends Sortable> extends BaseService<T>
 				entity.setSort(count+1);
 			}else{
 				//其他情况属于在中间插入,要把原来排在该位置及以上的所有数据上移一个单位
-				String queryString = "update o from " + getEntityClass().getSimpleName() + " o set sort=sort+1 " + entity.getSortHql() + " and sort>=?";
-				dao().execute(queryString, values, entity.getSort());
+				String queryString = "update " + getEntityClass().getSimpleName() + " o set sort=sort+1 " + entity.getSortHql() + " and sort>=?";
+				dao().execute(queryString, ArrayUtils.add(values, entity.getSort()));
 			}
 			dao().insert(entity);
 		}catch(Exception e){
@@ -36,15 +38,16 @@ public abstract class SortableService<T extends Sortable> extends BaseService<T>
 			}else if(entity.getSort() > count){
 				entity.setSort(count);
 			}
-			String queryString = "update o from " + getEntityClass().getSimpleName() + " o ";
+			String queryString = "update " + getEntityClass().getSimpleName() + " o ";
 			//如果是下移,要把新位置与旧位置之间的数据全部上移一个单位,不包括自己
 			//如果是上移,要把新位置与旧位置之间的数据全部下移一个单位,不包括自己
 			if(entity.getSort() < old.getSort()){
-				queryString = "set sort=sort-1 " + entity.getSortHql() + " and sort>=? and sort<?";
-			}else{
-				queryString = "set sort=sort+1 " + entity.getSortHql() + " and sort<=? and sort>?";
+				queryString += "set sort=sort+1 " + entity.getSortHql() + " and sort>=? and sort<?";
+			}else if(entity.getSort() > old.getSort()){
+				queryString += "set sort=sort-1 " + entity.getSortHql() + " and sort<=? and sort>?";
 			}
-			dao().execute(queryString, values, old.getSort(), entity.getSort());
+			if(!entity.getSort().equals(old.getSort()))
+				dao().execute(queryString, ArrayUtils.addAll(values, new Object[]{entity.getSort(), old.getSort()}));
 			dao().update(entity);
 		}catch(Exception e){
 			e.printStackTrace();
@@ -56,8 +59,8 @@ public abstract class SortableService<T extends Sortable> extends BaseService<T>
 		try{
 			T entity = dao().find(id);
 			//删除之后要把排在上面的数据全部都下移一个单位
-			String queryString = "update o from " + getEntityClass().getSimpleName() + " o " + entity.getSortHql() + " and sort>?";
-			dao().execute(queryString, values, entity.getSort());
+			String queryString = "update " + getEntityClass().getSimpleName() + " o set sort=sort-1 " + entity.getSortHql() + " and sort>?";
+			dao().execute(queryString, ArrayUtils.add(values, entity.getSort()));
 			dao().delete(id);
 		}catch(Exception e){
 			e.printStackTrace();
