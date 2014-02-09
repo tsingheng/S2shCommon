@@ -25,8 +25,8 @@ public abstract class BaseAction<T extends IBaseEntity> extends BaseMVC implemen
 	protected T entity;
 	protected Integer id;
 	protected abstract BaseService<T> service();
-	protected static final String GET = "GET";
-	protected static final String FORM = "form";
+	public static final String GET = "GET";
+	public static final String FORM = "form";
 	public static final String SUCCESS = "success";
 	
 	@Override

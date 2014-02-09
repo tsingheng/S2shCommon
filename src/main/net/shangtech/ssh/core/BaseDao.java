@@ -163,15 +163,15 @@ public class BaseDao<T> extends HibernateDaoSupport {
 	 * 描述：
 	 */
 	public List<T> find(final int start, final int limit, String hql, final Object...values){
-		final String queryString = "from " + getEntityClass().getSimpleName() + " o " + hql;
-		return super.getHibernateTemplate().executeFind(new HibernateCallback<List<T>>(){
+		final String queryString = "select o from " + getEntityClass().getSimpleName() + " o " + hql;
+		return super.getHibernateTemplate().execute(new HibernateCallback<List<T>>(){
 			@Override
 			public List<T> doInHibernate(Session session)
 					throws HibernateException, SQLException {
 				Query query = session.createQuery(queryString);
 				if(values != null && values.length > 0){
 					for(int i = 0; i < values.length; i++){
-						query.setParameter(i+1, values[i]);
+						query.setParameter(i, values[i]);
 					}
 				}
 				query.setFirstResult(start);
