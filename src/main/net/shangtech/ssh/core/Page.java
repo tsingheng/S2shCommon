@@ -19,6 +19,16 @@ public class Page<T> {
 	private int pageSize;
 	private int totalCount;
 	private List<T> result;
+	/** 是否显示左边的省略号 **/
+	private boolean leftPoints;
+	
+	/** 是否显示右边的省略号 **/
+	private boolean rightPoints;
+	
+	/** 页码链接从第几页开始 **/
+	private int pageStart;
+	
+	private int pageEnd;
 	private String hql;
 	private Object[] values;
 	public void setQuery(String hql, Object...values){
@@ -32,6 +42,9 @@ public class Page<T> {
 		return values;
 	}
 	public Page(int limit){
+		if(limit == 0){
+			limit = 15;
+		}
 		this.limit = limit;
 	}
 	public int getStart() {
@@ -82,12 +95,51 @@ public class Page<T> {
 		}
 		//计算起始位置
 		start = (pageNo-1)*limit;
+		pageStart = 1;
+		pageEnd = pageSize;
+		if(pageSize > 10){
+			if(pageNo > 5){
+				pageStart = pageNo - 4;
+				if(pageStart > pageSize-10){
+					pageStart = pageSize-10;
+				}
+				leftPoints = true;
+			}
+			if(pageSize-pageNo>5){
+				pageEnd = pageStart+9;
+				rightPoints = true;
+			}
+		}
 	}
 	public List<T> getResult() {
 		return result;
 	}
 	public void setResult(List<T> result) {
 		this.result = result;
+	}
+	public boolean isLeftPoints() {
+		return leftPoints;
+	}
+	public void setLeftPoints(boolean leftPoints) {
+		this.leftPoints = leftPoints;
+	}
+	public boolean isRightPoints() {
+		return rightPoints;
+	}
+	public void setRightPoints(boolean rightPoints) {
+		this.rightPoints = rightPoints;
+	}
+	public int getPageStart() {
+		return pageStart;
+	}
+	public void setPageStart(int pageStart) {
+		this.pageStart = pageStart;
+	}
+	public int getPageEnd() {
+		return pageEnd;
+	}
+	public void setPageEnd(int pageEnd) {
+		this.pageEnd = pageEnd;
 	}
 	
 }

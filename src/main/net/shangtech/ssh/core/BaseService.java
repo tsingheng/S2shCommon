@@ -128,6 +128,21 @@ public abstract class BaseService<T> {
 	
 	/**
 	 * 作者： 宋相恒<br/>
+	 * 版本： 2014-2-23 下午7:05:12 v1.0<br/>
+	 * 日期： 2014-2-23<br/>
+	 * @param hql
+	 * @param start
+	 * @param limit
+	 * @param values
+	 * @return<br/>
+	 * 描述：
+	 */
+	public List<T> find(int start, int limit, String hql, Object...values){
+		return dao().find(start, limit, hql, values);
+	}
+	
+	/**
+	 * 作者： 宋相恒<br/>
 	 * 版本： 2014-1-14 下午9:01:11 v1.0<br/>
 	 * 日期： 2014-1-14<br/>
 	 * @param page
